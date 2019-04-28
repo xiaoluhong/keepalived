@@ -25,7 +25,7 @@ RUN apk --no-cache add \
        openssl \
        openssl-dev \
        autoconf \
-    && cd /tmp/keepalived-sources && autoconf \
+    && cd /tmp/keepalived-sources \
     && ./configure --disable-dynamic-linking \
     && make && make install \
     && cd - \
