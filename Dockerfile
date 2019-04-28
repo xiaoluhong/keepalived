@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM osixia/alpine-light-baseimage:0.1.6
 
 # add keepalived sources to /tmp/keepalived-sources
 ADD . /tmp/keepalived-sources
