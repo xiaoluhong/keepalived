@@ -1,46 +1,48 @@
+# Use osixia/light-baseimage
+# sources: https://github.com/osixia/docker-light-baseimage
 FROM osixia/alpine-light-baseimage:0.1.6
 
-# add keepalived sources to /tmp/keepalived-sources
-ADD . /tmp/keepalived-sources
+# Keepalived version
+ARG KEEPALIVED_VERSION=2.0.15
 
-# Add keepalived default script user to make sure their IDs get assigned consistently,
-# regardless of whatever dependencies get added
-RUN addgroup -S keepalived_script && adduser -D -S -G keepalived_script keepalived_script
-
-# 1. install required libraries and tools
-# 2. compile and install keepalived
-# 3. remove keepalived sources and unnecessary libraries and tools
+# Download, build and install Keepalived
 RUN apk --no-cache add \
-       gcc \
-       ipset \
-       ipset-dev \
-       iptables \
-       iptables-dev \
-       libnfnetlink \
-       libnfnetlink-dev \
-       libnl3 \
-       libnl3-dev \
-       make \
-       musl-dev \
-       openssl \
-       openssl-dev \
-       autoconf \
-    && cd /tmp/keepalived-sources \
+    autoconf \
+    curl \
+    gcc \
+    ipset \
+    ipset-dev \
+    iptables \
+    iptables-dev \
+    libnfnetlink \
+    libnfnetlink-dev \
+    libnl3 \
+    libnl3-dev \
+    make \
+    musl-dev \
+    openssl \
+    openssl-dev \
+    && curl -o keepalived.tar.gz -SL http://keepalived.org/software/keepalived-${KEEPALIVED_VERSION}.tar.gz \
+    && mkdir -p /container/keepalived-sources \
+    && tar -xzf keepalived.tar.gz --strip 1 -C /container/keepalived-sources \
+    && cd container/keepalived-sources \
     && ./configure --disable-dynamic-linking \
     && make && make install \
-    && cd - \
-    && rm -rf /tmp/keepalived-sources \
+    && cd - && mkdir -p /etc/keepalived \
+    && rm -f keepalived.tar.gz \
+    && rm -rf /container/keepalived-sources \
     && apk --no-cache del \
-	gcc \
-	ipset-dev \
-	iptables-dev \
-	libnfnetlink-dev \
-	libnl3-dev \
-	make \
-	musl-dev \
-	openssl-dev \
-	autoconf
-
+    autoconf \
+    curl \
+    gcc \
+    ipset-dev \
+    iptables-dev \
+    libnfnetlink-dev \
+    libnl3-dev \
+    make \
+    musl-dev \
+    openssl-dev
+ 
 ADD docker/keepalived.conf /usr/local/etc/keepalived/keepalived.conf
 
 # set keepalived as image entrypoint with --dont-fork and --log-console (to make it docker friendly)
