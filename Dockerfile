@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.5
 
 # add keepalived sources to /tmp/keepalived-sources
 ADD . /tmp/keepalived-sources
