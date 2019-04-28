@@ -1,5 +1,4 @@
-FROM alpine:3.5
-MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
+FROM alpine
 
 # add keepalived sources to /tmp/keepalived-sources
 ADD . /tmp/keepalived-sources
@@ -26,12 +25,10 @@ RUN apk --no-cache add \
        openssl \
        openssl-dev \
        autoconf \
-
     && cd /tmp/keepalived-sources \
     && ./configure --disable-dynamic-linking \
     && make && make install \
     && cd - \
-
     && rm -rf /tmp/keepalived-sources \
     && apk --no-cache del \
 	gcc \
@@ -48,7 +45,5 @@ ADD docker/keepalived.conf /usr/local/etc/keepalived/keepalived.conf
 
 # set keepalived as image entrypoint with --dont-fork and --log-console (to make it docker friendly)
 # define /usr/local/etc/keepalived/keepalived.conf as the configuration file to use
-ENTRYPOINT ["/usr/local/sbin/keepalived","--dont-fork","--log-console", "-f","/usr/local/etc/keepalived/keepalived.conf"]
+ENTRYPOINT ["/usr/local/sbin/keepalived", "--dont-fork", "--log-console", "-f", "/usr/local/etc/keepalived/keepalived.conf"]
 
-# example command to customise keepalived daemon:
-# CMD ["--log-detail","--dump-conf"]
